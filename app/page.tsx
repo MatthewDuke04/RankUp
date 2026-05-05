@@ -48,6 +48,10 @@ export default function Home() {
           setRp(data.rp || 0);
           setBio(data.bio || '');
 
+          if (data.photoURL) {
+            setPreviewImage(data.photoURL);
+          }
+
           // Update rank
           if (data.rp >= 300) setRank("Gold");
           else if (data.rp >= 100) setRank("Silver");
