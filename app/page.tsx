@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../firebase'; 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -16,7 +16,7 @@ export default function Home() {
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [bio, setBio] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
   // Helper: Determine Rank
   const getRank = (rp: number) => {
     if (rp >= 300) return "Gold";
@@ -117,12 +117,36 @@ export default function Home() {
 
           <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-3xl">
             <h2 className="text-sm font-bold uppercase text-gray-400 mb-4">Profile Settings</h2>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-zinc-800 overflow-hidden border-2 border-blue-500 flex-shrink-0">
-                {previewImage ? <img src={previewImage} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[8px]">N/A</div>}
-              </div>
-              <input type="file" accept="image/*" onChange={handleImageChange} className="text-[10px] text-zinc-500" />
-            </div>
+            <div className="flex flex-col items-center gap-4 mb-6">
+  {/* The Profile Circle acts as the button */}
+  <div 
+    onClick={() => fileInputRef.current?.click()}
+    className="group relative w-20 h-20 rounded-full bg-zinc-800 overflow-hidden border-2 border-blue-500 cursor-pointer hover:border-white transition-all"
+  >
+    {previewImage ? (
+      <img src={previewImage} className="w-full h-full object-cover" />
+    ) : (
+      <div className="w-full h-full flex items-center justify-center text-[10px]">ADD PHOTO</div>
+    )}
+    {/* Dark overlay on hover */}
+    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+      <span className="text-[8px] font-bold">CHANGE</span>
+    </div>
+  </div>
+
+  {/* Hidden real input - this removes the "No file chosen" text forever */}
+  <input 
+    type="file" 
+    ref={fileInputRef}
+    onChange={handleImageChange} 
+    accept="image/*" 
+    className="hidden" 
+  />
+  
+  <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">
+    Tap photo to upload
+  </p>
+</div>
             <textarea placeholder="Bio..." className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm mb-4 h-20 outline-none focus:border-blue-500" onChange={e => setBio(e.target.value)} value={bio} />
             <button onClick={saveProfile} className="w-full bg-blue-600 font-black py-3 rounded-xl text-xs uppercase">Save Profile</button>
           </div>
